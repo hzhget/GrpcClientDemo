@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package database;
+import "google/protobuf/timestamp.proto";
+
+option java_generic_services = true;
+option java_multiple_files = true;
+option java_package = "com.esquel.pmm.protobuf.db";
+
+message DatabaseSchema {
+  string                    creatorID   = 1;
+  string                    modifierID  = 2;
+  string                    deleterID   = 3;
+
+  google.protobuf.Timestamp createdAt   = 4;
+  google.protobuf.Timestamp updatedAt   = 5;
+  google.protobuf.Timestamp deletedAt   = 6;
+
+  string                    name        = 7;
+  string                    description = 8;
+}
+
+service DatabaseSchemaMutation {
+  rpc Create(CreateDatabaseRequest) returns (DatabaseSchema);
+}
+
+message CreateDatabaseRequest {
+  string creatorID   = 1;
+  string name        = 2;
+  string description = 3;
+}

@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package database;
+import "google/protobuf/empty.proto";
+
+import "db/table_schema.proto";
+
+option java_generic_services = true;
+option java_multiple_files = true;
+option java_package = "com.esquel.pmm.protobuf.db";
+
+// enum TableRelation {
+
+// }
+message TableRelationshipSchema {
+  string relation           = 1; //<, -, ><
+  string fromTableSchemaID  = 2;
+  string fromColumnSchemaID = 3;
+  string toTableSchemaID    = 4;
+  string toColumnSchemaID   = 5;
+}
+
+service TableRelationshipSchemaMutation {
+  rpc Create(TableRelationshipSchema) returns (TableRelationshipSchema);
+  rpc Delete(TableRelationshipSchema) returns (google.protobuf.Empty);
+}
+
+message ListRelationshipRequest {
+  string tableSchemaID = 1;
+  string relation      = 2;
+}
+service TableRelationshipSchemaQuery {
+  rpc ListRelationship(ListRelationshipRequest) returns (ListTableSchemaResponse);
+}

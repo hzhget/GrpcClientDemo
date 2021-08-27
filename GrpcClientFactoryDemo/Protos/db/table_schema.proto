@@ -1,0 +1,162 @@
+syntax = "proto3";
+
+package database;
+import "google/protobuf/timestamp.proto";
+
+import "db/column_schema.proto";
+
+option java_generic_services = true;
+option java_multiple_files = true;
+option java_package = "com.esquel.pmm.protobuf.db";
+
+enum TableSchemaStatus {
+  DEVELOPING = 0;
+  PENDING    = 1;
+  RELEASED   = 2;
+  REJECTED   = 3;
+}
+
+message TableSchema {
+  string                    creatorID     = 1;
+  string                    modifierID    = 2;
+  string                    deleterID     = 3;
+
+  google.protobuf.Timestamp createdAt     = 4;
+  google.protobuf.Timestamp updatedAt     = 5;
+  google.protobuf.Timestamp deletedAt     = 6;
+
+  string                    id            = 7;
+  string                    name          = 8;
+  string                    description   = 9;
+  string                    status        = 10;
+
+  repeated Index            indexes       = 11;
+
+  message Index {
+    string          id              = 1;
+    IndexType       type            = 2;
+    repeated string columnSchemaIDs = 3;
+  }
+
+  repeated ColumnSchema     columnSchemas = 12;
+}
+
+service TableSchemaMutation {
+  rpc Create (CreateTableSchemaRequest) returns (TableSchema);
+  rpc Update (UpdateTableSchemaRequest) returns (TableSchema);
+  rpc Delete (DeleteTableSchemaRequest) returns (TableSchema);
+  rpc UnDelete (UnDeleteTableSchemaRequest) returns (TableSchema);
+  rpc Publish (PublishTableSchemaRequest) returns (TableSchema);
+  rpc Approve (ApproveTableSchemaRequest) returns (TableSchema);
+  rpc Reject (RejectTableSchemaRequest) returns (TableSchema);
+
+  rpc CreateIndex (CreateIndexRequest) returns (TableSchema);
+  rpc DeleteIndex (DeleteIndexRequest) returns (TableSchema);
+
+  // Take care when use it. It will clean all database data !!!
+  rpc DropTable (DropTableRequest) returns (DropTableResponse);
+}
+
+service TableSchemaQuery {
+  rpc GetByID (GetTableSchemaRequest) returns (TableSchema);
+  rpc List (ListTableSchemaRequest) returns (ListTableSchemaResponse);
+  rpc ListRows (ListRowsRequest) returns (ListRowsResponse);
+}
+
+message CreateTableSchemaRequest {
+  string                   creatorID = 1;
+  string                   name      = 2;
+  oneof descriptionWrapper {
+    string description = 3;
+  }
+  repeated database.Column columns   = 4;
+}
+
+message UpdateTableSchemaRequest {
+  string modifierID = 1;
+  string id         = 2;
+  oneof nameWrapper {
+    string name = 3;
+  }
+  oneof descriptionWrapper {
+    string description = 4;
+  }
+}
+
+message DeleteTableSchemaRequest {
+  string deleterID = 1;
+  string id        = 2;
+}
+
+message UnDeleteTableSchemaRequest {
+  string modifierID = 1;
+  string id         = 2;
+}
+
+message PublishTableSchemaRequest {
+  string modifierID = 1;
+  string id         = 2;
+}
+
+message ApproveTableSchemaRequest {
+  string modifierID = 1;
+  string id         = 2;
+}
+
+message RejectTableSchemaRequest {
+  string modifierID = 1;
+  string id         = 2;
+}
+
+message GetTableSchemaRequest {
+  string id = 1;
+}
+
+message ListTableSchemaRequest {}
+
+message ListTableSchemaResponse {
+  repeated TableSchema data = 1;
+}
+
+enum IndexType {
+  UNION  = 0;
+  UNIQUE = 1;
+}
+
+message CreateIndexRequest {
+  string          modifierID      = 1;
+  string          id              = 2;
+  IndexType       type            = 3;
+  repeated string columnSchemaIDs = 4;
+}
+
+message DeleteIndexRequest {
+  string modifierID = 1;
+  string id         = 2;
+  string indexID    = 3;
+}
+
+message DropTableRequest {}
+
+message DropTableResponse {}
+
+message ListRowsRequest {
+  string id = 1;
+}
+
+message ListRowsResponse {
+  string       id   = 1;
+  repeated Row rows = 2;
+
+  message Row {
+    string        rowID = 1;
+    repeated Cell cells = 8;
+  }
+
+  message Cell {
+    string columnSchemaID = 1;
+    string name           = 2;
+    string value          = 3;
+    string type           = 4;
+  }
+}

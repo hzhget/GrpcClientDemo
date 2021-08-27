@@ -1,0 +1,165 @@
+syntax = "proto3";
+
+package database;
+import "google/protobuf/timestamp.proto";
+
+option java_generic_services = true;
+option java_multiple_files = true;
+option java_package = "com.esquel.pmm.protobuf.db";
+
+message Column {
+  oneof nameWrapper {
+    string name = 1;
+  }
+  oneof descriptionWrapper {
+    string description = 2;
+  }
+  oneof typeWrapper {
+    string type = 3; // database type
+  }
+  oneof defaultValueWrapper {
+    string defaultValue = 4;
+  }
+  oneof multipleWrapper {
+    bool multiple = 5;
+  }
+  oneof requiredWrapper {
+    bool required = 6;
+  }
+  oneof uniqueWrapper {
+    bool unique = 7;
+  }
+  oneof titleWrapper {
+    string title = 8;
+  }
+  oneof referenceWrapper {
+    Reference reference = 9;
+  }
+}
+
+message Reference {
+  string tableSchemaID  = 1;
+  string columnSchemaID = 2;
+}
+
+message ColumnSchema {
+  string                    creatorID     = 1;
+  string                    modifierID    = 2;
+  string                    deleterID     = 3;
+
+  google.protobuf.Timestamp createdAt     = 4;
+  google.protobuf.Timestamp updatedAt     = 5;
+  google.protobuf.Timestamp deletedAt     = 6;
+
+  string                    tableSchemaID = 7;
+  string                    id            = 8;
+  string                    name          = 9;
+  string                    description   = 10;
+  string                    type          = 11;
+  string                    defaultValue  = 12;
+
+  bool                      multiple      = 13; // FALSE ; TRUE: ARRAY<TYPE>
+
+  oneof referenceTo {
+    Reference reference = 15;
+  }
+  //  Reference                 reference     = 15;
+
+  bool                      unique        = 16;
+  bool                      required      = 17; // not null
+  string                    title         = 18;
+
+  // enum Constraint {
+  //   NONE = 0;
+  //   UNIQUE = 1;
+  //   NOT_NULL = 2;
+  //   FOREIGN_KEY = 3;
+  // }
+}
+
+service ColumnSchemaQuery {
+  rpc GetByID (GetColumnSchemaRequest) returns (ColumnSchema);
+  rpc List (ListColumnSchemaRequest) returns (ListColumnSchemaResponse);
+}
+
+service ColumnSchemaMutation {
+  rpc Create (CreateColumnsRequest) returns (CreateColumnsResponse);
+  rpc Update (UpdateColumnRequest) returns (ColumnSchema);
+  rpc Delete (DeleteColumnsRequest) returns (DeleteColumnsResponse);
+  rpc UnDelete (UnDeleteColumnsRequest) returns (UnDeleteColumnsResponse);
+}
+
+message CreateColumnsRequest {
+  string          creatorID     = 1;
+  string          tableSchemaID = 2;
+  repeated Column columns       = 3;
+}
+
+message DeleteColumnsRequest {
+  string          deleterID     = 1;
+  string          tableSchemaID = 2;
+  repeated string ids           = 3;
+}
+
+message UnDeleteColumnsRequest {
+  string          modifierID    = 1;
+  string          tableSchemaID = 2;
+  repeated string ids           = 3;
+}
+
+message UpdateColumnRequest {
+  string modifierID = 1;
+  string id         = 2;
+
+  oneof nameWrapper {
+    string name = 3;
+  }
+  oneof descriptionWrapper {
+    string description = 4;
+  }
+  oneof typeWrapper {
+    string type = 5;
+  }
+  oneof defaultValueWrapper {
+    string defaultValue = 6;
+  }
+  oneof multipleWrapper {
+    bool multiple = 7;
+  }
+  oneof requiredWrapper {
+    bool required = 8;
+  }
+  oneof uniqueWrapper {
+    bool unique = 9;
+  }
+  oneof titleWrapper {
+    string title = 10;
+  }
+  oneof referenceWrapper {
+    Reference reference = 11;
+  }
+}
+
+message GetColumnSchemaRequest {
+  string id = 1;
+}
+
+message ListColumnSchemaRequest {
+  string tableSchemaID = 1;
+}
+
+message ListColumnSchemaResponse {
+  repeated ColumnSchema data = 1;
+}
+
+message CreateColumnsResponse {
+  repeated ColumnSchema data = 1;
+}
+
+message DeleteColumnsResponse {
+  repeated ColumnSchema data = 1;
+}
+
+message UnDeleteColumnsResponse {
+  repeated ColumnSchema data = 1;
+}

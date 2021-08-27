@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+package sheet;
+
+import "google/protobuf/struct.proto";
+
+message Sheet {
+
+  message Column {
+
+    string                 schema       = 1; // "name.first"
+    string                 title        = 2;
+    string                 description  = 3;
+    Type                   type         = 4;
+    bool                   multiple     = 5;
+    bool                   required     = 6;
+    google.protobuf.Value  defaultValue = 12;
+    int32                  width        = 7; // <= 0 : auto
+    Alignment              alignment    = 9;
+    bool                   hidden       = 10;
+    google.protobuf.Struct settings     = 11; // {icon: "", background: ""...}
+
+    enum Alignment {
+      right  = 0;
+      left   = 1;
+      center = 2;
+    }
+
+    enum Type {
+      text       = 0;
+      integer    = 1;
+      decimal    = 2;
+      date       = 3;
+      datetime   = 4;
+      image      = 5;
+      url        = 6;
+      object     = 7; // json
+      uuid       = 8;
+      attachment = 9;
+      tag        = 10; // the input value will add to options
+    }
+
+    message Datasource {
+      enum Type {
+        none    = 0; // by input or if is a relation type, will choose from relation
+        options = 1; //select ["a", "b", "c"] or [{key:"a", value: "b"}]
+        url     = 2; // will fetch json from url, and trans to options
+      }
+      Type                  type  = 1;
+      google.protobuf.Value value = 2;
+    }
+  }
+
+  string                          title              = 1;
+  string                          description        = 10;
+  repeated Column                 columns            = 2;
+  repeated google.protobuf.Struct rows               = 3; // [{name: {first: "Young", last: "Yang"}, id: "1"}]
+  int32                           columnWidth        = 4;
+  int32                           rowHeight          = 5;
+  bool                            readonly           = 6;
+  repeated string                 fixedLeftColumns   = 7;
+  repeated string                 fixedRighttColumns = 8;
+  google.protobuf.Struct          settings           = 9; // {cover: "http://....jpg"}
+}

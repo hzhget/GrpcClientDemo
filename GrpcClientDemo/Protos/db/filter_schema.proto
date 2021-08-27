@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package database;
+
+import "google/protobuf/timestamp.proto";
+
+option java_generic_services = true;
+option java_multiple_files = true;
+option java_package = "com.esquel.pmm.protobuf.db";
+
+
+message FilterSchemaRequest {
+  string tableSchemaID = 1;
+  string name          = 2;
+  string filter        = 3;
+  int32  pageSize      = 4;
+  int32  pageNumber    = 5;
+}
+
+message FilterSchemaResponse {
+  string       tableSchemaID = 1;
+  repeated Row rows          = 2;
+  int32        total         = 3;
+  message Row {
+    string                    rowID      = 1;
+    string                    creatorID  = 2;
+    string                    modifierID = 3;
+    string                    deleterID  = 4;
+    google.protobuf.Timestamp createdAt  = 5;
+    google.protobuf.Timestamp updatedAt  = 6;
+    google.protobuf.Timestamp deletedAt  = 7;
+
+    repeated Cell             cells      = 8;
+  }
+
+  message Cell {
+    string columnSchemaID = 1;
+    string name           = 2;
+    string value          = 3;
+    string type           = 4;
+    string fieldID        = 5;
+  }
+}
+
+
+service FilterQuery {
+  rpc QueryByFilter(FilterSchemaRequest) returns (FilterSchemaResponse);
+}
